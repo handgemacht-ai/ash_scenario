@@ -27,3 +27,6 @@ ash_ai-*.tar
 /tmp/
 
 priv/static/
+
+# Claude Code (symlinked to root)
+.claude
