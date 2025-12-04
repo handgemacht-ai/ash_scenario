@@ -1,0 +1,8 @@
+{
+  "$schema": "https://handgemacht.ai/schemas/project-config.json",
+  "name": "ash_scenario",
+  "elixirDir": ".",
+  "elixirTestCmd": ["mix", "test"],
+  "elixirCheckCmd": ["mix", "check"],
+  "elixirCredoCmd": ["mix", "credo", "list", "--format=oneline"]
+}
