@@ -207,6 +207,7 @@ defmodule AshScenario.Scenario.Registry do
             resource: resource_module,
             attributes: prototype.attributes,
             dependencies: extract_dependencies(resource_module, prototype),
+            actor: Map.get(prototype, :actor),
             action: Map.get(prototype, :action),
             function: Map.get(prototype, :function)
           }
