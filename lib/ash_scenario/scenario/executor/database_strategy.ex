@@ -34,9 +34,7 @@ defmodule AshScenario.Scenario.Executor.DatabaseStrategy do
              resource_module,
              create_action,
              attributes,
-             opts
-             |> Keyword.put(:__explicit_nil_keys__, explicit_nil_keys)
-             |> Keyword.put(:actor, actor)
+             Keyword.put(opts, :__explicit_nil_keys__, explicit_nil_keys)
            ) do
       create_opts =
         [domain: domain]

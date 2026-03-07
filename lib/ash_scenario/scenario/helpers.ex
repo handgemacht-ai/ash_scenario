@@ -215,7 +215,7 @@ defmodule AshScenario.Scenario.Helpers do
   Returns `{:ok, changeset, tenant_value}` where tenant_value may be nil
   if the resource doesn't use attribute-based multitenancy.
   """
-  def build_changeset(resource_module, action_name, attributes, opts) do
+  def build_changeset(resource_module, action_name, attributes, _opts) do
     # Drop nil values
     sanitized_attributes =
       attributes
@@ -226,13 +226,9 @@ defmodule AshScenario.Scenario.Helpers do
     {:ok, tenant_value, clean_attributes} =
       AshScenario.Multitenancy.extract_tenant_info(resource_module, sanitized_attributes)
 
-    # Pass actor to changeset so relate_actor changes can resolve it
-    actor = Keyword.get(opts, :actor)
-    changeset_opts = if actor, do: [actor: actor], else: []
-
     changeset =
       resource_module
-      |> Ash.Changeset.for_create(action_name, clean_attributes, changeset_opts)
+      |> Ash.Changeset.for_create(action_name, clean_attributes)
 
     {:ok, changeset, tenant_value}
   rescue

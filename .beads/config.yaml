@@ -1,0 +1,6 @@
+prefix: as
+issue-prefix: "as"
+
+sync.mode: "dolt-native"
+
+sync-branch: "beads-sync"
