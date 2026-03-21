@@ -30,3 +30,7 @@ priv/static/
 
 # Claude Code (symlinked to root)
 .claude
+
+# Track Claude rules and skills (override .claude ignore)
+!.claude/rules/
+!.claude/skills/
