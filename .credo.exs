@@ -89,7 +89,6 @@
         #
         {Credo.Check.Design.TagTODO, false},
         {Credo.Check.Design.TagFIXME, []},
-        {HandgemachtCredo.Check.Design.BroadSpec, []},
 
         #
         ## Readability Checks
