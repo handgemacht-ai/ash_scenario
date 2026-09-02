@@ -98,7 +98,8 @@ defmodule AshScenario do
         {Post, :draft}
       ], overrides: %{{Post, :draft} => %{title: "Custom Title"}})
   """
-  @spec run(list({module(), atom()}), keyword()) :: {:ok, map()} | {:error, any()}
+  @spec run(list({module(), atom()}), keyword()) ::
+          {:ok, %{{module(), atom()} => struct()}} | {:error, term()}
   defdelegate run(prototype_refs, opts \\ []), to: Scenario
 
   @doc """
@@ -119,7 +120,8 @@ defmodule AshScenario do
       {:ok, resources} = AshScenario.run_all(Post)
       {:ok, structs} = AshScenario.run_all(Post, strategy: :struct)
   """
-  @spec run_all(module(), keyword()) :: {:ok, map()} | {:error, any()}
+  @spec run_all(module(), keyword()) ::
+          {:ok, %{{module(), atom()} => struct()}} | {:error, term()}
   defdelegate run_all(resource_module, opts \\ []), to: Scenario
 
   @doc """
@@ -138,7 +140,8 @@ defmodule AshScenario do
       {:ok, instances} = AshScenario.run_scenario(MyTest, :basic_setup, domain: MyApp.Domain)
       {:ok, structs} = AshScenario.run_scenario(MyTest, :basic_setup, strategy: :struct)
   """
-  @spec run_scenario(module(), atom(), keyword()) :: {:ok, map()} | {:error, String.t()}
+  @spec run_scenario(module(), atom(), keyword()) ::
+          {:ok, %{atom() => struct()}} | {:error, String.t()}
   defdelegate run_scenario(test_module, scenario_name, opts \\ []), to: Scenario
 
   @doc """
