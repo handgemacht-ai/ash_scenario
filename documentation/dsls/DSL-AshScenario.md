@@ -56,6 +56,7 @@ Define named prototypes for creating test data
  * [create](#prototypes-create)
  * [prototype](#prototypes-prototype)
    * attr
+   * actor
    * create
 
 
@@ -97,6 +98,7 @@ prototype ref
 
 ### Nested DSLs
  * [attr](#prototypes-prototype-attr)
+ * [actor](#prototypes-prototype-actor)
  * [create](#prototypes-prototype-create)
 
 
@@ -146,6 +148,33 @@ attr name, value
 ### Introspection
 
 Target: `AshScenario.Dsl.Attr`
+
+### prototypes.prototype.actor
+```elixir
+actor value
+```
+
+
+
+
+
+
+
+
+### Arguments
+
+| Name | Type | Default | Docs |
+|------|------|---------|------|
+| [`value`](#prototypes-prototype-actor-value){: #prototypes-prototype-actor-value .spark-required} | `atom \| {atom, atom}` |  | Actor prototype reference for authorization (e.g., :admin_user or {User, :admin_user}) |
+
+
+
+
+
+
+### Introspection
+
+Target: `AshScenario.Dsl.Actor`
 
 ### prototypes.prototype.create
 

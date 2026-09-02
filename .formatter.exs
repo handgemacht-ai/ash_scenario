@@ -1,5 +1,7 @@
 spark_locals_without_parens = [
   action: 1,
+  actor: 1,
+  actor: 2,
   attr: 2,
   attr: 3,
   create: 0,
