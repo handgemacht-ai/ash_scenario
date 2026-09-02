@@ -242,17 +242,13 @@ defmodule AshScenario.Scenario.Registry do
     attribute_deps =
       prototype.attributes
       |> Enum.reduce([], fn {key, value}, acc ->
-        cond do
-          # Regular relationship attributes
-          is_atom(value) ->
-            case related_module_for_attr(resource_module, key) do
-              {:ok, related_module} -> [{related_module, value} | acc]
-              :error -> acc
-            end
-
-          # Skip non-atom values
-          true ->
-            acc
+        if is_atom(value) do
+          case related_module_for_attr(resource_module, key) do
+            {:ok, related_module} -> [{related_module, value} | acc]
+            :error -> acc
+          end
+        else
+          acc
         end
       end)
 
