@@ -68,12 +68,7 @@ if Code.ensure_loaded?(Tailwind) do
     def style_tag do
       case css_content() do
         {:ok, content} ->
-          Phoenix.HTML.raw("""
-          <style>
-          /* AshScenario Tailwind CSS */
-          #{content}
-          </style>
-          """)
+          {:safe, ["<style>\n/* AshScenario Tailwind CSS */\n", content, "\n</style>"]}
 
         {:error, :not_compiled} ->
           if Mix.env() == :dev do
@@ -104,9 +99,9 @@ if Code.ensure_loaded?(Tailwind) do
           path
         end
 
-      Phoenix.HTML.raw("""
-      <link rel="stylesheet" href="#{path_with_version}" />
-      """)
+      {:safe, escaped_path} = Phoenix.HTML.html_escape(path_with_version)
+
+      {:safe, ["<link rel=\"stylesheet\" href=\"", escaped_path, "\" />"]}
     end
 
     @doc """
