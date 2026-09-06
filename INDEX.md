@@ -1,7 +1,7 @@
 ---
 type: index
 last_verified: 2026-09-06
-upstream_commit: PLACEHOLDER
+upstream_commit: e9ce25cfc8aad346319910c785398bd20f996db6
 sources:
   - README.md
   - CLAUDE.md
