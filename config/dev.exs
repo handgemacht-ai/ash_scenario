@@ -32,6 +32,7 @@ if Mix.env() == :dev do
   config :git_hooks,
     auto_install: true,
     verbose: true,
+    project_path: "",
     hooks: [
       pre_commit: [
         tasks: [
