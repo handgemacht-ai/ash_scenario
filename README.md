@@ -1,3 +1,13 @@
+---
+title: AshScenario
+type: reference
+summary: Prototype/scenario DSL and run/run_all/run_scenario public API for reusable Ash test data with dependency resolution.
+owner: ash_scenario
+status: current
+tags: [elixir, ash, testing]
+last_verified: 2026-09-06
+---
+
 # AshScenario
 
 Ash Scenario allows you to define reusable test data for your application. It provides two main approaches:

@@ -2,7 +2,7 @@
 
 ## Overview
 
-AshScenario is a testing and data generation framework for Ash resources that provides a declarative way to create test data with automatic dependency resolution. The architecture follows a modular design with clear separation of concerns between DSL definition, execution strategies, and resource creation.
+AshScenario is a testing and data generation framework for Ash resources that provides a declarative way to create test data with automatic dependency resolution. The architecture follows a modular design with clear separation of concerns between DSL definition, execution strategies, and resource creation. Around the core, three optional submodules provide developer-facing tooling: Clarity introspection dashboards, Tailwind CSS asset management, and a pre-commit formatting hook.
 
 ## Core Components
 
@@ -169,3 +169,57 @@ The framework automatically handles multi-tenant resources:
 DSL transformers validate and process prototype definitions:
 - **`ValidatePrototypes`** - Ensures prototype validity
 - **`RegisterPrototypes`** - Registers prototypes with the registry
+
+## Optional Submodules
+
+### Clarity Integration (`lib/ash_scenario/clarity/`)
+
+An optional integration with Clarity that adds LiveView dashboards for browsing and running prototypes from inside the Clarity UI. The `Introspector` and `Vertex.Prototypes` modules are guarded by `if Code.ensure_loaded?(Clarity)` (`introspector.ex:1`, `vertex/prototypes.ex:1`), so they compile away when Clarity is not a dependency. The two LiveViews (`prototype_live.ex:1`, `prototypes_dashboard_live.ex:1`) are plain modules that depend on `phoenix_live_view` (an optional dependency in `mix.exs`) and do not compile away; they reference `AshScenario.Tailwind.Assets` defensively via `Code.ensure_loaded?` (`prototype_live.ex:100`, `prototypes_dashboard_live.ex:116`).
+
+#### Key Modules:
+- **`AshScenario.Clarity.Introspector`** (`introspector.ex`) - Implements `@behaviour Clarity.Introspector` (`introspector.ex:12`); enabled by adding the module to the host app's `:clarity_introspectors` configuration (`introspector.ex:6`)
+- **`AshScenario.Clarity.Vertex.Prototypes`** (`vertex/prototypes.ex`) - Clarity vertex for the global "All Prototypes" hub (unique id `"ash_scenario:prototypes"`, dot shape `"folder"`)
+- **`AshScenario.Clarity.PrototypeLive`** (`prototype_live.ex`) - Per-resource LiveView for a resource's prototypes
+- **`AshScenario.Clarity.PrototypesDashboardLive`** (`prototypes_dashboard_live.ex`) - Global dashboard across all resources that have prototypes
+
+#### How it attaches:
+`Introspector.introspect/1` augments Clarity's `:digraph` graph in two ways:
+- A global prototypes vertex is attached to the Clarity root vertex, with the `PrototypesDashboardLive` mounted as its content (`introspector.ex:37-52`)
+- For every resource vertex satisfying `Info.has_prototypes?(resource)`, a `"Prototypes"` content vertex is attached that mounts `PrototypeLive` for that resource (`introspector.ex:54-66`)
+
+#### Capabilities:
+- **Per-resource page** (`PrototypeLive`): lists prototypes and their attributes/virtuals/functions from `Info.prototypes/1`; each prototype can be run with the `:database` or `:struct` strategy via `AshScenario.run/2` (`prototype_live.ex:39`), or all at once via `AshScenario.run_all/1` (`prototype_live.ex:63`); related Ash resources with prototypes are linked for navigation
+- **Dashboard** (`PrototypesDashboardLive`): discovers all loaded Ash resources with prototypes by scanning `Application.loaded_applications()` modules (`prototypes_dashboard_live.ex:305`), supports per-resource selection and batch execution via `AshScenario.run_all/1` (`prototypes_dashboard_live.ex:85`)
+- Both LiveViews inject the Tailwind CSS assets inline when available (`prototype_live.ex:101`, `prototypes_dashboard_live.ex:117`)
+
+### Tailwind Assets (`lib/ash_scenario/tailwind/assets.ex`)
+
+Optional Tailwind CSS support for the Clarity dashboards, guarded by `if Code.ensure_loaded?(Tailwind)` (`assets.ex:1`). The compiled stylesheet `priv/static/ash_scenario.css` is embedded at compile time via `@external_resource` (`assets.ex:9`) with an MD5-based hash for cache busting (`assets.ex:17-18`).
+
+#### Public API (`AshScenario.Tailwind.Assets`):
+- `css_content/0`, `css_hash/0`, `css_path/0`, `compiled?/0` - access to the embedded stylesheet
+- `build_css/0` - runs `mix tailwind ash_scenario --minify`, only outside `:prod` (`assets.ex:56-57`)
+- `style_tag/0` - inline `<style>` tag with the CSS content
+- `link_tag/1` - `<link>` tag pointing at the CSS file with a cache-busting `?v=` parameter (`assets.ex:96-97`)
+- `inject/1` - convenience for LiveView templates; `inline: true` yields `style_tag/0`, otherwise `link_tag/1` (`assets.ex:125`)
+- `available?/0` - whether CSS is compiled (warns in `:dev` when it isn't) (`assets.ex:139`)
+- `classes/2` - Tailwind classes with a `:fallback` when unavailable (`assets.ex:164`)
+
+#### Security:
+This module is the asset/HTML-rendering surface and was the site of sobelow `XSS.Raw` findings, fixed in commit 3e7c809:
+- `link_tag/1` HTML-escapes the caller-supplied path via `Phoenix.HTML.html_escape/1` before emitting it into the `href` attribute (`assets.ex:102`), rather than interpolating it raw
+- `style_tag/0` returns safe iodata directly instead of interpolating CSS content into a `Phoenix.HTML.raw` heredoc
+
+Regression tests for the escaping behavior live in `test/ash_scenario/tailwind/assets_test.exs` (commit 9c96cb8).
+
+### Pre-Commit Formatter (`lib/ash_scenario/pre_commit/formatter.ex`)
+
+A developer-tooling hook — not part of the runtime library — that keeps staged code formatted.
+
+`AshScenario.PreCommit.Formatter.run/1` (`formatter.ex:11`):
+1. Gets staged files via `git diff --cached --name-only --diff-filter=d` (`formatter.ex:23`)
+2. Filters to Elixir files (`.ex`, `.exs`) and HEEx templates (`.heex`) (`formatter.ex:39`)
+3. Runs `mix format` on them (`formatter.ex:46`)
+4. Re-stages the formatted files with `git add` (`formatter.ex:55`)
+
+Returns `:ok` on success or `{:error, reason}` if any git/mix step fails. Any step with no matching files is a no-op.

@@ -1,3 +1,13 @@
+---
+title: ash_scenario examples
+type: reference
+summary: Self-contained Mix project demonstrating ash_scenario prototypes and the scenario DSL across a multi-tenant launch-workspace domain.
+owner: ash_scenario
+status: current
+tags: [elixir, ash, testing]
+last_verified: 2026-09-06
+---
+
 # ash_scenario examples
 
 This lightweight Mix project demonstrates how to define prototypes and scenarios
@@ -17,6 +27,6 @@ mix deps.get
 mix test
 ```
 
-The tests exercise both `AshScenario.run_prototype/3` and the scenario DSL so you
+The tests exercise both `AshScenario.run_scenario/3` (via `AshScenario.Scenario.run_scenario/3`) and the scenario DSL so you
 can see how dependency resolution, overrides, and custom creation functions fit
 together.

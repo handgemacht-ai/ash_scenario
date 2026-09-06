@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-11-04
+
+### Added
+- Runtime MFA evaluation for prototype attributes (763ae69)
+
+### Changed
+- Upgraded dependencies (4f176a1)
+
+## [0.4.0] - 2025-10-19
+
+### Added
+- `actor` field added to the prototype DSL for authorization (cc84821)
+
+### Changed
+- Added `__spark_metadata__` field to DSL entities and upgraded dependencies (b9ed0da)
+
 ## [0.3.0] - 2025-10-06
 
 ### Added
